@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resize My Photo Editor — Professional Photo Workspace</title>
+  <meta name="description" content="Edit, compress, and convert exam photos. Real-time adjustments, exact KB targeting, background removal." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- Dark mode: apply before render to prevent flash -->
+  <script>if(localStorage.getItem('resizemyphoto-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');</script>
+  <style>
+    /* ── Editor Layout ── */
+    .editor-page { background: var(--surface-container-low); min-height: 100vh; }
+    .editor-header {
+      background: var(--surface-container-lowest);
+      border-bottom: 1px solid rgba(226,191,176,0.3);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .editor-header-left { display: flex; align-items: center; gap: 0.75rem; }
+    .editor-header h1 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; }
+    .editor-header-meta { font-size: 0.75rem; color: var(--on-surface-variant); }
+
+    .editor-body {
+      display: grid;
+      grid-template-columns: 300px 1fr 300px;
+      min-height: calc(100vh - 130px);
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--surface-container-lowest);
+      border-right: 1px solid rgba(226,191,176,0.2);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      overflow-y: auto;
+    }
+    .panel:last-child { border-right: none; border-left: 1px solid rgba(226,191,176,0.2); }
+    .panel-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--on-surface-variant);
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--surface-container);
+    }
+
+    /* Center workspace */
+    .workspace {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1.25rem 2rem 2rem;
+      gap: 1.5rem;
+      position: relative;
+    }
+
+    /* Upload empty state */
+    #empty-state { width: 100%; max-width: 500px; }
+
+    /* Preview */
+    #preview-wrap {
+      position: relative;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 1rem;
+    }
+    #preview-canvas {
+      max-width: 100%;
+      max-height: 460px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-float);
+      object-fit: contain;
+    }
+    .preview-info-bar {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-full);
+      padding: 0.4rem 1rem;
+      box-shadow: var(--shadow-card);
+    }
+    .info-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-weight: 500;
+    }
+    .info-pill span { font-size: 0.85rem; }
+
+    /* Exam preset chips */
+    .preset-chips {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    /* Adjustments */
+    .sliders-group { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    /* Format toggle */
+    .format-toggle {
+      display: flex;
+      background: var(--surface-container);
+      border-radius: var(--radius-full);
+      padding: 3px;
+      gap: 3px;
+    }
+    .format-btn {
+      flex: 1;
+      padding: 0.35rem;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: var(--on-surface-variant);
+      transition: all var(--transition-fast);
+    }
+    .format-btn.active {
+      background: var(--surface-container-lowest);
+      color: var(--primary);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* BG color picker */
+    .bg-swatches {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color var(--transition-fast), transform var(--transition-fast);
+      flex-shrink: 0;
+    }
+    .swatch:hover { transform: scale(1.1); }
+    .swatch.active { border-color: var(--primary); }
+    .swatch-custom {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .swatch-custom input { width: 40px; height: 40px; border: none; cursor: pointer; margin: -6px 0 0 -6px; }
+
+    /* Compliance meter */
+    .compliance-bar {
+      background: var(--surface-container);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      font-size: 0.8125rem;
+    }
+    .compliance-label { display: flex; justify-content: space-between; margin-bottom: 0.5rem; }
+    .compliance-track { height: 6px; background: var(--surface-container-high); border-radius: 6px; overflow: hidden; }
+    .compliance-fill { height: 100%; background: var(--gradient-primary); border-radius: 6px; transition: width 0.4s ease; }
+
+    /* Processing overlay */
+    .processing-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(251,249,248,0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      border-radius: var(--radius-md);
+      z-index: 10;
+    }
+    .processing-overlay.active { display: flex; }
+    .processing-text { font-family: var(--font-display); font-weight: 600; color: var(--on-surface); }
+
+    /* API key modal */
+    #apikey-modal .modal { max-width: 440px; }
+
+    /* Result badge */
+    .result-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1024px) {
+      .editor-body { grid-template-columns: 260px 1fr; }
+      .panel:last-child { display: none; }
+    }
+    @media (max-width: 768px) {
+      .editor-body { grid-template-columns: 1fr; }
+      .panel { border-right: none; border-bottom: 1px solid rgba(226,191,176,0.2); }
+      .editor-header { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body class="editor-page">
+
+<!-- ── Navbar ── -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="navbar-brand">Resize My Photo</a>
+  <ul class="navbar-nav" id="navbar-nav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="editor.html">Editor</a></li>
+    <li><a href="presets.html">Presets</a></li>
+    <li><a href="support.html">FAQs</a></li>
+    <li><a href="support.html#contact">Contact</a></li>
+  </ul>
+  <div class="navbar-cta" style="display:flex;align-items:center;gap:0.5rem">
+    <button id="theme-toggle" title="Toggle Dark Mode">
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="icon-sun" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <a href="presets.html" class="btn btn-secondary btn-sm">Exam Presets</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── Editor Header ── -->
+<div class="editor-header">
+  <div class="editor-header-left">
+    <div style="width:36px;height:36px;border-radius:var(--radius-sm);background:var(--primary-fixed);color:var(--primary);display:flex;align-items:center;justify-content:center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+    </div>
+    <div>
+      <h1>Image Editor</h1>
+      <p class="editor-header-meta" id="file-meta">No file loaded — drag a photo to get started</p>
+    </div>
+  </div>
+  <div style="display:flex;gap:0.75rem;align-items:center">
+    <button class="btn btn-secondary btn-sm" id="btn-new-upload">↑ New Upload</button>
+    <button class="btn btn-danger btn-sm" id="btn-remove-bg" disabled>✕ Remove BG</button>
+    <button class="btn btn-primary" id="btn-process" disabled>
+      <span id="process-btn-text">Process &amp; Download</span>
+    </button>
+  </div>
+</div>
+
+<!-- ── Editor Body ── -->
+<div class="editor-body">
+
+  <!-- ── Left Panel: Presets + Settings ── -->
+  <div class="panel">
+    <!-- hidden file input still used by "New Upload" header button -->
+    <input type="file" id="main-file-input" class="dropzone-input" accept="image/jpeg,image/png,image/webp,image/heic" multiple style="display:none" />
+
+    <div>
+      <p class="panel-title">Exam Presets</p>
+      <select id="preset-select" class="preset-select">
+        <option value="">-- Custom (No Preset) --</option>
+        <option value="JEE Main / Advanced">JEE Main / Advanced (413×531)</option>
+        <option value="NEET UG — Passport Photo">NEET UG — Passport Photo</option>
+        <option value="NEET UG — Signature">NEET UG — Signature</option>
+        <option value="CAT (IIM)">CAT (IIM)</option>
+        <option value="SSC CGL / CHSL">SSC CGL / CHSL</option>
+        <option value="SSC — Signature">SSC — Signature</option>
+        <option value="UPSC CSE (IAS/IPS)">UPSC CSE (IAS/IPS)</option>
+        <option value="IBPS PO / Clerk / SO">IBPS PO / Clerk / SO</option>
+        <option value="RRB NTPC / Group D">RRB NTPC / Group D</option>
+        <option value="GATE">GATE</option>
+        <option value="CUET (UG/PG)">CUET (UG/PG)</option>
+      </select>
+      <div id="preset-info" class="preset-notes"></div>
+    </div>
+
+    <div>
+      <p class="panel-title">Output Format</p>
+      <div class="format-toggle">
+        <button class="format-btn active" data-fmt="jpeg" id="fmt-jpg">JPG</button>
+        <button class="format-btn" data-fmt="png" id="fmt-png">PNG</button>
+      </div>
+    </div>
+
+    <div>
+      <p class="panel-title">Target Size & Quality</p>
+      <div class="field-group">
+        <label class="field-label" for="target-kb">Max KB</label>
+        <input type="number" id="target-kb" class="field-input" value="50" min="5" max="2000" />
+      </div>
+      <div class="field-group" style="margin-top:0.75rem; display:none;">
+        <label class="field-label" for="min-kb">Min KB (optional)</label>
+        <input type="number" id="min-kb" class="field-input" value="" min="0" max="1000" placeholder="0" />
+      </div>
+      <div class="slider-group" style="margin-top:1.25rem">
+        <div class="slider-header">
+          <span class="slider-title">Quality % (Compression)</span>
+          <span class="slider-value" id="val-quality">80</span>
+        </div>
+        <input type="range" id="sl-quality" min="10" max="100" value="80" />
+      </div>
+    </div>
+
+    <div>
+      <p class="panel-title">Dimensions (px)</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+        <div class="field-group">
+          <label class="field-label">Width</label>
+          <input type="number" id="out-width" class="field-input" placeholder="Auto" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Height</label>
+          <input type="number" id="out-height" class="field-input" placeholder="Auto" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Center: Workspace ── -->
+  <div class="workspace">
+    <!-- Empty state -->
+    <div id="empty-state">
+      <div class="dropzone" id="center-dropzone" style="padding:2.5rem 2rem 2rem">
+        <input type="file" id="center-file-input" class="dropzone-input" accept="image/jpeg,image/png,image/webp,image/heic" multiple />
+        <div class="dropzone-icon" style="width:72px;height:72px;color:var(--primary);">
+          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+        </div>
+        <h2 class="title-lg" style="margin-bottom:0.5rem">Drop your photo here</h2>
+        <p class="body-sm text-muted" style="margin-bottom:1.5rem">PNG, JPG, WebP or HEIC — you can select multiple photos at once</p>
+        <button class="btn btn-primary btn-lg" id="browse-files-btn">Browse Files</button>
+        <p class="label-sm text-muted" style="margin-top:1rem">Or select an exam preset from the left panel →</p>
+      </div>
+    </div>
+
+    <!-- Process Another Photo button -->
+    <div id="add-another-wrap" style="display:none;width:100%;max-width:500px">
+      <button class="btn btn-secondary btn-sm" id="btn-add-another" style="width:100%;border-style:dashed">↻ Process Another Photo</button>
+    </div>
+
+    <!-- Preview state -->
+    <div id="preview-wrap">
+      <canvas id="preview-canvas"></canvas>
+      <div class="preview-info-bar">
+        <div class="info-pill">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" y1="3" x2="3" y2="21"/><line x1="21" y1="3" x2="21" y2="9"/><line x1="21" y1="3" x2="15" y2="3"/><line x1="3" y1="21" x2="3" y2="15"/><line x1="3" y1="21" x2="9" y2="21"/></svg>
+          <span id="info-dims">—</span>
+        </div>
+        <div class="info-pill">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          <span id="info-size">—</span>
+        </div>
+        <div class="info-pill">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <span id="info-format">JPG</span>
+        </div>
+      </div>
+      <div id="processing-overlay" class="processing-overlay">
+        <div class="spinner" style="width:36px;height:36px;border-width:3px"></div>
+        <span class="processing-text" id="processing-text">Processing…</span>
+      </div>
+    </div>
+
+    <!-- Compliance meter / Badge -->
+    <div id="compliance-wrap" style="width:100%;max-width:520px;display:none;text-align:center">
+      <div id="compliance-badge" class="result-badge within">
+        ✓ Within spec (— KB)
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Right Panel: Adjustments + Export ── -->
+  <div class="panel">
+    <div>
+      <p class="panel-title">Adjustments</p>
+      <div class="sliders-group">
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-title">Brightness</span>
+            <span class="slider-value" id="val-brightness">100</span>
+          </div>
+          <input type="range" id="sl-brightness" min="0" max="200" value="100" />
+        </div>
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-title">Contrast</span>
+            <span class="slider-value" id="val-contrast">100</span>
+          </div>
+          <input type="range" id="sl-contrast" min="0" max="200" value="100" />
+        </div>
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-title">Saturation</span>
+            <span class="slider-value" id="val-saturation">100</span>
+          </div>
+          <input type="range" id="sl-saturation" min="0" max="200" value="100" />
+        </div>
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-title">Sharpness</span>
+            <span class="slider-value" id="val-sharpness">0</span>
+          </div>
+          <input type="range" id="sl-sharpness" min="0" max="100" value="0" />
+        </div>
+      </div>
+      <button class="btn btn-tertiary btn-sm" id="btn-reset-adj" style="margin-top:0.75rem">↺ Reset Adjustments</button>
+    </div>
+
+    <div>
+      <p class="panel-title">Background Color</p>
+      <div class="bg-swatches">
+        <div class="swatch active" data-color="#ffffff" style="background:#ffffff;box-shadow:0 0 0 1px #ccc" title="White"></div>
+        <div class="swatch" data-color="#add8e6" style="background:#add8e6" title="Light Blue"></div>
+        <div class="swatch" data-color="#f0f0f0" style="background:#f0f0f0" title="Light Gray"></div>
+        <div class="swatch" data-color="#faf0e6" style="background:#faf0e6" title="Linen"></div>
+        <div class="swatch" data-color="transparent" style="background:repeating-conic-gradient(#ccc 0% 25%,transparent 0% 50%) 0 0/10px 10px" title="Transparent"></div>
+        <div class="swatch-custom" title="Custom color">
+          <input type="color" id="custom-bg-color" value="#ffffff" title="Pick custom color" />
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="panel-title">Export Info</p>
+      <div id="export-info" style="display:flex;flex-direction:column;gap:0.5rem">
+        <div style="display:flex;justify-content:space-between;font-size:0.8125rem">
+          <span class="text-muted">Preset</span>
+          <span id="ei-preset" style="font-weight:600">Custom</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8125rem">
+          <span class="text-muted">Output size</span>
+          <span id="ei-size" style="font-weight:600">Auto</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8125rem">
+          <span class="text-muted">Format</span>
+          <span id="ei-format" style="font-weight:600">JPG</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:0.8125rem">
+          <span class="text-muted">Target KB</span>
+          <span id="ei-kb" style="font-weight:600">50 KB</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="panel-title">Quick Actions</p>
+      <div style="display:flex;flex-direction:column;gap:0.75rem">
+        <button class="btn btn-primary" id="btn-process-side" disabled>⬇ Process &amp; Download</button>
+        <button class="btn btn-secondary" id="btn-remove-bg-side" disabled>✕ Remove Background</button>
+        <button class="btn btn-outline btn-sm" id="btn-reset-all">⟳ Reset All</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Google AdSense Placeholder -->
+<div class="container" style="padding-top: 2rem;">
+  <div class="ad-placeholder" style="margin: 0 auto; max-width: 900px; text-align: center; background: var(--surface-container); border: 1px dashed var(--outline); padding: 1rem; color: var(--on-surface-variant); border-radius: var(--radius-sm); min-height: 120px; display: flex; align-items: center; justify-content: center;">
+    <div style="font-size: 0.875rem; font-weight: 500;">
+      [ Google AdSense Advertisement Block ]
+    </div>
+  </div>
+</div>
+
+<!-- ── Remove.bg API Key Modal ── -->
+<div class="modal-overlay" id="apikey-modal">
+  <div class="modal" id="apikey-modal-inner">
+    <div class="modal-header">
+      <h3 class="headline-sm">Remove Background</h3>
+      <button class="modal-close" id="apikey-close">✕</button>
+    </div>
+    <div class="callout" style="margin-bottom:1.5rem">
+      <span class="callout-icon">ℹ</span>
+      <span>Background removal uses the <strong>Remove.bg API</strong>. Enter your free API key from <a href="https://www.remove.bg/api" target="_blank" style="color:var(--tertiary);font-weight:600">remove.bg</a>. Your key is stored only in your browser session.</span>
+    </div>
+    <div class="field-group" style="margin-bottom:1.5rem">
+      <label class="field-label" for="apikey-input">Remove.bg API Key</label>
+      <input type="text" id="apikey-input" class="field-input" placeholder="Paste your API key here…" />
+    </div>
+    <div style="display:flex;gap:0.75rem;justify-content:flex-end">
+      <button class="btn btn-secondary" id="apikey-cancel">Cancel</button>
+      <button class="btn btn-primary" id="apikey-confirm">Remove Background →</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/app.js"></script>
+<script src="js/editor-ui.js"></script>
+</body>
+</html>

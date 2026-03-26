@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resize My Photo Presets — Exam Document Preparation Hub</title>
+  <meta name="description" content="Prepare all exam documents — photo, signature, certificate — for JEE, NEET, CAT, SSC, Railway. Per-document upload with auto-processing and batch ZIP download." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- Dark mode: apply before render to prevent flash -->
+  <script>if(localStorage.getItem('resizemyphoto-theme')==='dark')document.documentElement.setAttribute('data-theme','dark');</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <style>
+    .presets-page { background: var(--surface-container-low); min-height: 100vh; }
+
+    /* Page header */
+    .page-hero {
+      background: var(--gradient-hero);
+      padding: 3rem 0 2.5rem;
+    }
+    .page-hero h1 { margin-bottom: 0.75rem; }
+    .page-hero p  { color: var(--on-surface-variant); font-size: 1.0625rem; }
+
+    /* Exam selector */
+    .exam-selector-wrap {
+      background: var(--surface-container-lowest);
+      padding: 1.5rem 0;
+      border-bottom: 1px solid rgba(226,191,176,0.25);
+      position: sticky;
+      top: 65px;
+      z-index: 50;
+    }
+    .exam-selector {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .exam-selector-label {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--on-surface-variant);
+      margin-right: 0.25rem;
+    }
+
+    /* Gauge section */
+    .gauge-section {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 2rem;
+    }
+    .gauge-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Doc section header */
+    .docs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Per-doc processing overlay */
+    .doc-processing {
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+      color: var(--primary);
+      font-weight: 500;
+    }
+    .doc-processing.active { display: flex; }
+
+    /* Preview thumbnail */
+    .doc-thumb {
+      width: 48px;
+      height: 56px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      box-shadow: var(--shadow-card);
+      display: none;
+      flex-shrink: 0;
+    }
+
+    /* No-exam empty state */
+    .empty-exam-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--on-surface-variant);
+    }
+    .empty-exam-state .big-icon { font-size: 3.5rem; margin-bottom: 1rem; opacity: 0.3; }
+
+    /* Batch download section */
+    .batch-section {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      text-align: center;
+      box-shadow: var(--shadow-card);
+      margin-top: 2rem;
+    }
+    .batch-section h3 { margin-bottom: 0.5rem; }
+    .batch-section p  { color: var(--on-surface-variant); margin-bottom: 1.5rem; font-size: 0.9375rem; }
+
+    /* Exam info card */
+    .exam-info-card {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-card);
+      margin-bottom: 1.5rem;
+    }
+    .exam-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    .exam-spec-item {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      text-align: center;
+    }
+    .exam-spec-value {
+      font-family: var(--font-display);
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .exam-spec-label { font-size: 0.7rem; color: var(--on-surface-variant); margin-top: 0.2rem; }
+  </style>
+</head>
+<body class="presets-page">
+
+<!-- ── Navbar ── -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="navbar-brand">Resize My Photo</a>
+  <ul class="navbar-nav" id="navbar-nav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="editor.html">Editor</a></li>
+    <li><a href="presets.html">Presets</a></li>
+    <li><a href="support.html">FAQs</a></li>
+    <li><a href="support.html#contact">Contact</a></li>
+  </ul>
+  <div class="navbar-cta" style="display:flex;align-items:center;gap:0.5rem">
+    <button id="theme-toggle" title="Toggle Dark Mode">
+      <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+      <svg class="icon-sun" style="display:none;" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+    <a href="editor.html" class="btn btn-secondary btn-sm">Open Editor</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── Page Hero ── -->
+<div class="page-hero">
+  <div class="container">
+    <div class="animate-fade-up">
+      <h1 class="display-md">Document Presets</h1>
+      <p>Choose your exam — we handle formatting, sizing, and compliance automatically.<br>Upload each document individually, then download everything as a ZIP.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Exam Selector ── -->
+<div class="exam-selector-wrap">
+  <div class="container">
+    <div class="exam-selector">
+      <span class="exam-selector-label">Select Exam:</span>
+      <button class="chip" data-exam="jee"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> JEE</button>
+      <button class="chip" data-exam="neet"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> NEET</button>
+      <button class="chip" data-exam="cat"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg> CAT</button>
+      <button class="chip" data-exam="ssc"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><path d="M9 22v-4h6v4"/><path d="M8 6h.01"/><path d="M16 6h.01"/><path d="M12 6h.01"/><path d="M12 10h.01"/><path d="M12 14h.01"/><path d="M16 10h.01"/><path d="M16 14h.01"/><path d="M8 10h.01"/><path d="M8 14h.01"/></svg> SSC</button>
+      <button class="chip" data-exam="railway"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 16v-6"/><path d="M15 16v-6"/><path d="M8 21h8"/></svg> Railway</button>
+    </div>
+  </div>
+</div>
+
+<!-- Google AdSense Placeholder -->
+<div class="container" style="padding-top: 2rem;">
+  <div class="ad-placeholder" style="margin: 0 auto; max-width: 900px; text-align: center; background: var(--surface-container); border: 1px dashed var(--outline); padding: 1rem; color: var(--on-surface-variant); border-radius: var(--radius-sm); min-height: 120px; display: flex; align-items: center; justify-content: center;">
+    <div style="font-size: 0.875rem; font-weight: 500;">
+      [ Google AdSense Advertisement Block ]
+    </div>
+  </div>
+</div>
+
+<!-- ── Main Content ── -->
+<div class="section-sm">
+  <div class="container">
+
+    <!-- No exam selected -->
+    <div id="empty-exam-state" class="empty-exam-state">
+      <div class="big-icon" style="display:flex;justify-content:center;margin-bottom:1rem;color:var(--on-surface-variant)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      </div>
+      <h2 class="headline-sm" style="margin-bottom:0.5rem">Select Your Exam Above</h2>
+      <p class="body-md text-muted">Pick an exam from the bar above to see its document requirements and start preparing your files.</p>
+    </div>
+
+    <!-- Exam content (hidden until exam selected) -->
+    <div id="exam-content" style="display:none">
+
+      <!-- Exam info -->
+      <div class="exam-info-card animate-fade">
+        <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.25rem">
+          <span id="exam-icon" style="font-size:1.5rem">🎓</span>
+          <h2 class="headline-sm" id="exam-title">JEE Main / Advanced</h2>
+          <div class="badge badge-info" id="exam-badge">NTA Portal</div>
+        </div>
+        <p class="body-sm text-muted" id="exam-desc" style="margin-bottom:1rem"></p>
+        <div class="exam-info-grid" id="exam-specs-grid"></div>
+      </div>
+
+      <!-- Preparation Gauge -->
+      <div class="gauge-section animate-fade">
+        <div class="gauge-header">
+          <div>
+            <p class="title-md">Preparation Gauge</p>
+            <p class="label-md text-muted" id="gauge-subtitle">0 of 4 documents ready</p>
+          </div>
+          <div class="badge badge-warning" id="gauge-badge">0%</div>
+        </div>
+        <div class="gauge">
+          <div class="gauge-track">
+            <div class="gauge-fill" id="gauge-fill" style="width:0%"></div>
+          </div>
+          <div class="gauge-steps" id="gauge-steps"></div>
+        </div>
+      </div>
+
+      <!-- Document rows -->
+      <div class="docs-header">
+        <h3 class="title-lg">Required Documents</h3>
+        <p class="label-md text-muted">Upload each document to check compliance</p>
+      </div>
+      <div id="doc-rows" style="display:flex;flex-direction:column;gap:0.75rem"></div>
+
+      <!-- Batch Download -->
+      <div class="batch-section animate-fade">
+        <div style="display:flex;justify-content:center;margin-bottom:1rem;color:var(--primary)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <h3 class="headline-sm">Download All Documents</h3>
+        <p>Once all documents are uploaded and processed, download them as a pre-formatted ZIP package ready for your application portal.</p>
+        <button class="btn btn-primary btn-lg" id="btn-batch-download">
+          ⬇ Download All as ZIP
+        </button>
+        <p class="label-sm text-muted" style="margin-top:1rem" id="zip-status">Upload and process at least one document to enable download.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Resize My Photo</div>
+        <p class="footer-tagline">Academic Concierge Service for Indian Competitive Exams.</p>
+      </div>
+      <div>
+        <p class="footer-col-title">Product</p>
+        <ul class="footer-links">
+          <li><a href="editor.html">Image Editor</a></li>
+          <li><a href="presets.html">Exam Presets</a></li>
+          <li><a href="support.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Exams</p>
+        <ul class="footer-links">
+          <li><a href="?exam=jee">JEE</a></li>
+          <li><a href="?exam=neet">NEET</a></li>
+          <li><a href="?exam=cat">CAT</a></li>
+          <li><a href="?exam=ssc">SSC</a></li>
+          <li><a href="?exam=railway">Railway</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Support</p>
+        <ul class="footer-links">
+          <li><a href="support.html">FAQ</a></li>
+          <li><a href="support.html#contact">Contact</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom">
+      <span>© 2024 Resize My Photo. Academic Concierge Service.</span>
+      <span>Made with ❤ for aspirants across India</span>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>
+<script src="js/editor.js"></script>
+<script src="js/app.js"></script>
+<script src="js/presets-ui.js"></script>
+</body>
+</html>

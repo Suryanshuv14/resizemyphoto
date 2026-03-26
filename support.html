@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support — Resize My Photo Academic Concierge</title>
+  <meta name="description" content="Frequently asked questions and contact information for Resize My Photo exam photo preparation service." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    .support-page { background: var(--surface-container-low); min-height: 100vh; }
+
+    .page-hero {
+      background: var(--gradient-hero);
+      padding: 4rem 0 3rem;
+    }
+    .page-hero h1 { margin-bottom: 0.75rem; }
+    .page-hero p { color: var(--on-surface-variant); font-size: 1.0625rem; }
+
+    .faq-section {
+      background: var(--surface-container-lowest);
+      padding: 4rem 0;
+    }
+    .faq-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    .faq-sidebar {
+      position: sticky;
+      top: 85px;
+    }
+    .faq-sidebar-title {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--on-surface-variant);
+      margin-bottom: 1rem;
+    }
+    .faq-category-link {
+      display: block;
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--on-surface-variant);
+      transition: all var(--transition-fast);
+      cursor: pointer;
+      margin-bottom: 0.25rem;
+    }
+    .faq-category-link:hover { background: var(--surface-container); color: var(--primary); }
+    .faq-category-link.active { background: var(--primary-fixed); color: var(--on-primary-container); font-weight: 600; }
+
+    .faq-stats {
+      background: var(--surface-container-low);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .faq-stat {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+    }
+    .faq-stat-icon { font-size: 1.1rem; }
+    .faq-stat-text { color: var(--on-surface-variant); }
+    .faq-stat-num  { font-weight: 700; color: var(--primary); }
+
+    .contact-section {
+      background: var(--gradient-hero);
+      padding: 5rem 0;
+    }
+    .contact-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .contact-card {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      transition: box-shadow var(--transition-fast);
+    }
+    .contact-card:hover { box-shadow: var(--shadow-soft); }
+    .contact-card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-md);
+      background: var(--primary-fixed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .contact-card-title { font-weight: 600; margin-bottom: 0.25rem; }
+    .contact-card-detail { font-size: 0.875rem; color: var(--on-surface-variant); }
+    .contact-card a { color: var(--tertiary); font-weight: 500; }
+
+    .social-grid {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1.25rem;
+      border-radius: var(--radius-full);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+    .social-btn.twitter  { background: #e8f4fd; color: #1da1f2; }
+    .social-btn.linkedin { background: #e6f0f8; color: #0077b5; }
+    .social-btn.insta    { background: #fce4ec; color: #e1306c; }
+    .social-btn:hover    { transform: translateY(-2px); box-shadow: var(--shadow-card); }
+
+    /* Contact form */
+    .contact-form {
+      background: var(--surface-container-lowest);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-float);
+    }
+    .contact-form h3 { margin-bottom: 1.5rem; }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    textarea.field-input {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    @media (max-width: 900px) {
+      .faq-layout     { grid-template-columns: 1fr; }
+      .faq-sidebar    { position: static; }
+      .contact-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="support-page">
+
+<!-- ── Navbar ── -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="navbar-brand">Resize My Photo</a>
+  <ul class="navbar-nav" id="navbar-nav">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="editor.html">Editor</a></li>
+    <li><a href="presets.html">Presets</a></li>
+    <li><a href="support.html">FAQs</a></li>
+    <li><a href="support.html#contact">Contact</a></li>
+  </ul>
+  <div class="navbar-cta">
+    <a href="editor.html" class="btn btn-primary btn-sm">Start Editing →</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- ── Page Hero ── -->
+<div class="page-hero">
+  <div class="container">
+    <div class="animate-fade-up">
+      <div class="badge badge-info" style="margin-bottom:1rem;display:inline-flex">Academic Excellence Support</div>
+      <h1 class="display-md">Support Concierge</h1>
+      <p>Expert assistance for your high-stakes exam applications. We've compiled the most frequent inquiries to help you stay ahead of deadlines.</p>
+      <div style="display:flex;gap:0.75rem;margin-top:1.5rem;flex-wrap:wrap">
+        <span class="badge badge-success"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.25rem"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg> 50,000+ students helped this year</span>
+        <span class="badge badge-info"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.15rem;vertical-align:text-bottom"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Average response: 24h</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FAQ Section ── -->
+<section class="faq-section" id="faqs">
+  <div class="container">
+    <div class="faq-layout">
+      <!-- Sidebar -->
+      <div class="faq-sidebar animate-fade-up">
+        <p class="faq-sidebar-title">Topics</p>
+        <div class="faq-category-link active" onclick="filterFAQ('all')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> All Questions</div>
+        <div class="faq-category-link" onclick="filterFAQ('general')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> General</div>
+        <div class="faq-category-link" onclick="filterFAQ('compression')"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.15rem;vertical-align:text-bottom"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Compression</div>
+        <div class="faq-category-link" onclick="filterFAQ('formats')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg> File Formats</div>
+        <div class="faq-category-link" onclick="filterFAQ('privacy')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Privacy</div>
+        <div class="faq-category-link" onclick="filterFAQ('presets')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> Exam Presets</div>
+        <div class="faq-category-link" onclick="filterFAQ('bgremoval')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg> BG Removal</div>
+
+        <div class="faq-stats">
+          <div class="faq-stat">
+            <span class="faq-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <div><span class="faq-stat-num">100K+</span> <span class="faq-stat-text">aspirants served</span></div>
+          </div>
+          <div class="faq-stat">
+            <span class="faq-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+            <div><span class="faq-stat-num">99.8%</span> <span class="faq-stat-text">portal success rate</span></div>
+          </div>
+          <div class="faq-stat">
+            <span class="faq-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.15rem;vertical-align:text-bottom"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></span>
+            <div><span class="faq-stat-num">&lt;2s</span> <span class="faq-stat-text">average processing</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ list -->
+      <div id="faq-list">
+        <!-- General -->
+        <div class="accordion-item animate-fade-up" data-category="general">
+          <button class="accordion-trigger">
+            What is Resize My Photo and how does it work?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Resize My Photo is a client-side image processing tool for Indian competitive exam aspirants. It runs entirely in your browser using the HTML5 Canvas API — no server uploads, no account required. Simply drag your photo, select your exam preset, adjust settings, and download the perfectly compressed and resized image.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="general">
+          <button class="accordion-trigger">
+            Is Resize My Photo free to use?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Yes! All core features — drag & drop upload, compression, resizing, format conversion, brightness/contrast adjustments, and exam presets — are completely free with no signup required. The only paid feature is Background Removal via the Remove.bg API, which requires your own API key (Remove.bg offers 50 free removals/month).
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="compression">
+          <button class="accordion-trigger">
+            How does the exact KB compression work?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Resize My Photo uses a binary search algorithm on the JPEG quality parameter (0–100%) to hit your exact target file size. It runs up to 30 iterations, each time adjusting the quality up or down until the output file size falls within your specified min–max KB range. This guarantees you hit portal requirements without unnecessarily degrading image quality.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="compression">
+          <button class="accordion-trigger">
+            The portal says "file too large" — what should I do?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Go to the Editor, upload your photo, and set the <strong>Max KB</strong> field to the portal's maximum (e.g., 50 KB for SSC). Click <em>Process & Download</em> — Resize My Photo will compress it to fit. Also ensure the pixel dimensions match (set Width and Height or use an exam preset that auto-fills them).
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="formats">
+          <button class="accordion-trigger">
+            Which file formats does Resize My Photo support for input?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Resize My Photo accepts <strong>JPG, PNG, WebP</strong>, and <strong>HEIC</strong> (Apple iPhone photos) as input. Output can be exported as JPG or PNG. Note: HEIC support depends on your browser — Safari on macOS/iOS handles it natively. On other browsers, use a HEIC-to-JPG converter first if you face issues.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="formats">
+          <button class="accordion-trigger">
+            Should I use JPG or PNG output for exam portals?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Almost all Indian exam portals (NTA, SSC, RRB) require <strong>JPG/JPEG</strong> format. PNG is only needed for documents that require transparency (rare). Resize My Photo defaults to JPG for all exam presets. PNG files are typically 3–5× larger, making it harder to hit the KB target.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="privacy">
+          <button class="accordion-trigger">
+            Is my photo data safe? Does Resize My Photo store my images?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Absolutely. Resize My Photo processes everything <strong>100% client-side</strong> in your browser — your photos never leave your device (except when you use the optional Remove.bg API feature, which sends your image to Remove.bg's servers). No servers, no cloud storage, no cookies containing your images.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="privacy">
+          <button class="accordion-trigger">
+            Is my Remove.bg API key stored safely?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Your API key is stored only in your browser's <code>sessionStorage</code> — it's cleared when you close the tab. It's never sent to Resize My Photo's servers (we don't have any). You can get a free API key at <a href="https://www.remove.bg/api" target="_blank" style="color:var(--tertiary);font-weight:600">remove.bg/api</a> (50 free removals/month).
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="presets">
+          <button class="accordion-trigger">
+            Which exams does Resize My Photo support with presets?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Currently Resize My Photo supports: <strong>JEE Main/Advanced</strong> (NTA), <strong>NEET UG</strong> (NTA), <strong>CAT</strong> (IIM), <strong>SSC CGL/CHSL</strong>, and <strong>Railway RRB/NTPC</strong>. Each preset auto-fills pixel dimensions, file size range, format, and background color. More exams (UPSC, GATE, CLAT) are planned.
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="presets">
+          <button class="accordion-trigger">
+            The exam portal rejected my photo even after using a preset. Why?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              Portal requirements can change between exam cycles. Always double-check the official notification for the current year's specifications. Common reasons for rejection: <ul style="margin-top:0.5rem;padding-left:1.25rem;display:flex;flex-direction:column;gap:0.35rem"><li>Photo not recent (must be within the last 6 months)</li><li>Face not centered or too small/large in frame</li><li>Background not plain white (glare, shadows count)</li><li>Non-formal attire or accessories like caps/sunglasses</li></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="accordion-item animate-fade-up" data-category="bgremoval">
+          <button class="accordion-trigger">
+            How do I use the Background Removal feature?
+            <span class="accordion-icon">+</span>
+          </button>
+          <div class="accordion-body">
+            <div class="accordion-body-inner">
+              1. Go to the <a href="editor.html" style="color:var(--tertiary);font-weight:600">Editor</a> and upload your photo.<br>
+              2. Click the <strong>"Remove BG"</strong> button in the toolbar.<br>
+              3. Enter your free Remove.bg API key (get one at remove.bg/api).<br>
+              4. The background will be removed. Then select a white or blue background swatch to fill in the exam-required color.<br>
+              5. Click <strong>"Process & Download"</strong> to save.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- Google AdSense Placeholder -->
+<div class="container" style="padding-bottom: 2rem;">
+  <div class="ad-placeholder" style="margin: 0 auto; max-width: 900px; text-align: center; background: var(--surface-container); border: 1px dashed var(--outline); padding: 1rem; color: var(--on-surface-variant); border-radius: var(--radius-sm); min-height: 120px; display: flex; align-items: center; justify-content: center;">
+    <div style="font-size: 0.875rem; font-weight: 500;">
+      [ Google AdSense Advertisement Block ]
+    </div>
+  </div>
+</div>
+
+
+<!-- ── Contact Section ── -->
+<section class="contact-section" id="contact">
+  <div class="container">
+    <div class="section-intro animate-fade-up" style="margin-bottom:3rem">
+      <h2 class="headline-md">Contact Us</h2>
+      <p style="color:var(--on-surface-variant)">Have questions? We're here to help.</p>
+    </div>
+
+    <div class="contact-layout">
+      <!-- Contact info -->
+      <div style="display:flex;flex-direction:column;gap:1.25rem">
+        <div class="contact-card animate-fade-up">
+          <div class="contact-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div>
+            <p class="contact-card-title">Support Email</p>
+            <p class="contact-card-detail">
+              <a href="mailto:support@resizemyphoto.com">support@resizemyphoto.com</a>
+            </p>
+            <p class="contact-card-detail" style="margin-top:0.25rem">Response within 24 hours</p>
+          </div>
+        </div>
+
+        <div class="contact-card animate-fade-up">
+          <div class="contact-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>
+          <div>
+            <p class="contact-card-title">Social Media</p>
+            <p class="contact-card-detail" style="margin-bottom:0.75rem">Follow us for tips, updates, and preset releases</p>
+            <div class="social-grid">
+              <a href="#" class="social-btn twitter"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/></svg> Twitter</a>
+              <a href="#" class="social-btn linkedin"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg> LinkedIn</a>
+              <a href="#" class="social-btn insta"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:0.35rem;vertical-align:text-bottom"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="8" y1="4" x2="8" y2="20"/><line x1="16" y1="4" x2="16" y2="20"/></svg> Instagram</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="contact-card animate-fade-up">
+          <div class="contact-card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div>
+            <p class="contact-card-title">Support Hours</p>
+            <p class="contact-card-detail">Monday – Saturday: 9 AM – 8 PM IST</p>
+            <p class="contact-card-detail">Peak support during NTA exam registration windows</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact form -->
+      <div class="contact-form animate-fade-up" style="animation-delay:0.15s">
+        <h3 class="headline-sm">Send a Message</h3>
+        <div style="display:flex;flex-direction:column;gap:1.25rem">
+          <div class="form-row">
+            <div class="field-group">
+              <label class="field-label" for="contact-name">Your Name</label>
+              <input type="text" id="contact-name" class="field-input" placeholder="e.g. Rahul Sharma" />
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="contact-email">Email Address</label>
+              <input type="email" id="contact-email" class="field-input" placeholder="you@example.com" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="contact-exam">Related Exam (optional)</label>
+            <select id="contact-exam" class="field-input">
+              <option value="">-- Select exam --</option>
+              <option value="jee">JEE Main / Advanced</option>
+              <option value="neet">NEET UG</option>
+              <option value="cat">CAT</option>
+              <option value="ssc">SSC CGL / CHSL</option>
+              <option value="railway">Railway RRB / NTPC</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="contact-subject">Subject</label>
+            <input type="text" id="contact-subject" class="field-input" placeholder="Brief description of your issue" />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="contact-message">Message</label>
+            <textarea id="contact-message" class="field-input" placeholder="Describe your issue or question in detail…" rows="5"></textarea>
+          </div>
+          <button class="btn btn-primary" id="btn-send-msg">Send Message →</button>
+          <p class="label-sm text-muted" id="form-status"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Resize My Photo</div>
+        <p class="footer-tagline">Academic Concierge Service for Indian Competitive Exams.</p>
+      </div>
+      <div>
+        <p class="footer-col-title">Product</p>
+        <ul class="footer-links">
+          <li><a href="editor.html">Image Editor</a></li>
+          <li><a href="presets.html">Exam Presets</a></li>
+          <li><a href="support.html">FAQ</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Exams</p>
+        <ul class="footer-links">
+          <li><a href="presets.html?exam=jee">JEE Main/Advanced</a></li>
+          <li><a href="presets.html?exam=neet">NEET UG</a></li>
+          <li><a href="presets.html?exam=cat">CAT</a></li>
+          <li><a href="presets.html?exam=ssc">SSC CGL</a></li>
+          <li><a href="presets.html?exam=railway">Railway RRB</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="footer-col-title">Legal</p>
+        <ul class="footer-links">
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#contact">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-divider"></div>
+    <div class="footer-bottom">
+      <span>© 2024 Resize My Photo. Academic Concierge Service.</span>
+      <span>Made with ❤ for aspirants across India</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast-container"></div>
+
+<script src="js/editor.js"></script>
+<script src="js/app.js"></script>
+<script>
+  // Init accordion
+  initAccordion();
+
+  // FAQ category filter
+  function filterFAQ(category) {
+    document.querySelectorAll('.faq-category-link').forEach(l => l.classList.remove('active'));
+    event.target.classList.add('active');
+    document.querySelectorAll('.accordion-item[data-category]').forEach(item => {
+      if (category === 'all' || item.dataset.category === category) {
+        item.style.display = '';
+      } else {
+        item.style.display = 'none';
+        item.classList.remove('open');
+      }
+    });
+  }
+
+  // Contact form
+  document.getElementById('btn-send-msg').addEventListener('click', () => {
+    const name    = document.getElementById('contact-name').value.trim();
+    const email   = document.getElementById('contact-email').value.trim();
+    const msg     = document.getElementById('contact-message').value.trim();
+    if (!name || !email || !msg) {
+      showToast('Please fill in name, email, and message', 'error');
+      return;
+    }
+    const statusEl = document.getElementById('form-status');
+    statusEl.textContent = 'Sending…';
+    statusEl.style.color = 'var(--on-surface-variant)';
+    // Simulate send
+    setTimeout(() => {
+      statusEl.textContent = '✓ Message sent! We\'ll reply within 24 hours.';
+      statusEl.style.color = 'var(--primary)';
+      ['contact-name','contact-email','contact-subject','contact-message'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      showToast('Message sent successfully!', 'success');
+    }, 1200);
+  });
+</script>
+</body>
+</html>
